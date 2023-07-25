@@ -2,22 +2,24 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# Function to read crime data from a CSV file into a DataFrame
 def read_crime_data(file_path):
     try:
-        df = pd.read_csv(file_path, low_memory=False)  # Read CSV file into a DataFrame
+        df = pd.read_csv(file_path, low_memory=False)
         return df
     except FileNotFoundError:
         print(f"File not found: {file_path}")
         return None
 
+# Function to remove unused columns from the DataFrame
 def remove_unused_columns(df):
     # Columns to remove from the DataFrame
     columns_to_remove = ['UOR_DESC', 'NIBRS_CODE', 'UCR_HIERARCHY', 'ATT_COMP', 'ObjectId']
-    df = df.drop(columns=columns_to_remove)  # Drop specified columns from the DataFrame
+    df = df.drop(columns=columns_to_remove)
     return df
 
+# Function to rename columns in the DataFrame for better readability
 def rename_columns(df):
-    # Rename columns in the DataFrame for better readability
     fixed_columns = {
         'INCIDENT_NUMBER': 'incident_number',
         'DATE_REPORTED': 'date_reported',
@@ -31,13 +33,15 @@ def rename_columns(df):
         'City': 'city',
         'ZIP_CODE': 'zip_code'
     }
-    df.rename(columns=fixed_columns, inplace=True)  # Rename columns in the DataFrame
+    df.rename(columns=fixed_columns, inplace=True)
     return df
 
+# Function to clean the DataFrame by dropping rows with missing values
 def clean_data(df):
-    df.dropna(inplace=True)  # Drop rows with any missing values from the DataFrame
+    df.dropna(inplace=True)
     return df
 
+# Main function to execute the entire analysis
 def main():
     # Read crime data for the years 2022 and 2021
     crime_data_22 = read_crime_data('assets/LMPD_Crime_Data_2022.csv')
@@ -63,34 +67,56 @@ def main():
     print("Shape of cleaned DataFrame:", combined_df.shape)
     print("Random 10 rows from the cleaned DataFrame:")
     print(combined_df.sample(10))
-    
-    # Visualization 1: Count of Crimes by Crime Type
+
+
+    # Visualization 1: Divisions by Most Crime Occurrence
     plt.figure(figsize=(10, 6))
-    sns.countplot(x='crime_type', data=combined_df, palette='viridis')
-    plt.title('Count of Crimes by Crime Type')
+    order_divisions = combined_df['lmpd_division'].value_counts().index
+    sns.countplot(data=combined_df, x='lmpd_division', hue='crime_type', order=order_divisions, palette='muted')
+    plt.title('Divisions by Most Crime Occurrence')
+    plt.xlabel('LMPD Division')
+    plt.ylabel('Count')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.legend(title='Crime Type', title_fontsize=10, fontsize=8)
+    plt.show()
+
+    # Interpretation: This visualization shows the distribution of crime occurrences in each LMPD division.
+    # The x-axis represents the LMPD divisions, and the y-axis represents the count of crimes in each division.
+    # Different crime types are represented by different colors, and the stacked bars show the count of each crime type within the division.
+    # The legend provides information about the crime types.
+
+    # Visualization 2: Proportion of Crime Types
+    plt.figure(figsize=(10, 6))
+    crime_type_counts = combined_df['crime_type'].value_counts(normalize=True) * 100
+    sns.barplot(x=crime_type_counts.index, y=crime_type_counts, palette='viridis')
+    plt.title('Proportion of Crime Types')
+    plt.xlabel('Crime Type')
+    plt.ylabel('Percentage')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+    # Interpretation: This visualization shows the proportion of each crime type in the dataset.
+    # The x-axis represents the crime types, and the y-axis represents the percentage of each crime type in the dataset.
+    # The bar heights represent the percentage of each crime type, and the x-axis labels show the crime types.
+    # This visualization provides insights into the relative frequency of different crime types in the dataset.
+
+    # Visualization 3: Top 3 Types of Crimes
+    plt.figure(figsize=(10, 6))
+    top_crimes = combined_df['crime_type'].value_counts().nlargest(3).index
+    sns.countplot(x='crime_type', data=combined_df, order=top_crimes, palette='viridis')
+    plt.title('Top 3 Types of Crimes')
     plt.xlabel('Crime Type')
     plt.ylabel('Count')
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.show()
 
-    # Visualization 2: Distribution of Crime Occurrence by Division
-    plt.figure(figsize=(10, 6))
-    sns.histplot(data=combined_df, x='lmpd_division', hue='crime_type', multiple='stack', palette='muted')
-    plt.title('Distribution of Crime Occurrence by Division')
-    plt.xlabel('LMPD Division')
-    plt.ylabel('Count')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.show()
-
-    # Visualization 3: Proportion of Crime Types
-    plt.figure(figsize=(8, 8))
-    combined_df['crime_type'].value_counts().plot.pie(autopct='%1.1f%%', shadow=True, explode=[0.05] * len(combined_df['crime_type'].unique()))
-    plt.title('Proportion of Crime Types')
-    plt.ylabel('')
-    plt.tight_layout()
-    plt.show()
+    # Interpretation: This visualization shows the top 3 most frequent types of crimes in the dataset.
+    # The x-axis represents the crime types, and the y-axis represents the count of each crime type.
+    # The bars are ordered based on the count of each crime type, with the most frequent crime type on the left.
+    # This visualization provides insights into the most common types of crimes recorded in the dataset.
 
 if __name__ == "__main__":
     main()

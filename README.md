@@ -33,11 +33,11 @@ pip install pandas matplotlib seaborn
 
 ## Features Included
 The project includes the following features to meet the requirements:
-- Reading crime data from CSV files and combining them into a single DataFrame.
-- Removing unused columns to improve data readability and analysis.
-- Renaming columns for better clarity and understanding.
-- Cleaning the data by dropping rows with missing values to ensure data integrity.
-- Generating three visualizations using Seaborn and Matplotlib to explore and display the crime data.
+- Read TWO data files.
+- Clean your data and perform a pandas merge with your two data sets, then calculate some new values based on the new data set.
+- Make 3 matplotlib or seaborn visualizations to display your data.
+- Build a custom data dictionary and include it in your README.
+- Annotate your .py files with well-written comments and a clear README.
 
 ## Custom Data Dictionary
 The columns in the cleaned DataFrame have been renamed for better readability. Here is a data dictionary explaining each column:
